@@ -97,8 +97,8 @@ onMounted(() => {
         <div class="project-selector" v-if="hasUser" @click="isSelecting = !isSelecting">
             <h1 v-if="currenProject == null">請選擇專案</h1>
             <h1 v-else>{{ currenProject }}</h1>
-            <img v-if="!isSelecting" class="select-arrow" src="/src/assets/images/icons/forward-arrow.svg" alt="選擇專案">
-            <img v-if="isSelecting" class="select-arrow" src="/src/assets/images/icons/down-arrow.svg" alt="選擇專案">
+            <img v-if="!isSelecting" class="select-arrow" src="/src/assets/images/icons/right-arrow-svgrepo-com.svg" alt="選擇專案">
+            <img v-if="isSelecting" class="select-arrow" src="/src/assets/images/icons/down-arrow-svgrepo-com.svg" alt="選擇專案">
             <div class="project-list" v-show="isSelecting">
                 <div>
                     <ul>
@@ -116,14 +116,14 @@ onMounted(() => {
         </div>
         <div class="project-selector" v-else>
             <h1 style="opacity: 0.5;">請選擇專案</h1>
-            <img class="select-arrow" style="opacity: 0.5;" src="/src/assets/images/icons/forward-arrow.svg" alt="選擇專案">
+            <img class="select-arrow" style="opacity: 0.5;" src="/src/assets/images/icons/right-arrow-svgrepo-com.svg" alt="選擇專案">
         </div>
         <div class="role-selector">
-            <div v-if="hasUser" style="color: darkblue; font-weight: bolder;">
+            <div v-if="hasUser" style="color: #a7a8bd; font-weight: bolder;">
                 <p>使用者： No.{{ props.user.id + ' ' + props.user.userName }}</p>
             </div>
             <div v-else>
-                <p style="color: darkblue; font-weight: bolder;">請設定使用者：</p>
+                <p style="color: #a7a8bd; font-weight: bolder;">請設定使用者：</p>
             </div>
             <div class="setting-button" @click="isSettingUser = !isSettingUser">
                 <img class="setting-icon" src="/src/assets/images/icons/settings-outline.svg" alt="設定">
@@ -136,8 +136,8 @@ onMounted(() => {
                 Access Token：
                 <n-input size="small" type="password" show-password-on="mousedown" v-model:value="user.accessToken"
                     round placeholder="請輸入 Token" style="margin-bottom: 12px;" />
-                <n-button strong secondary round style="margin-right: 12px;" @click="updateUserData">確認</n-button>
-                <n-button strong secondary round type="error" @click="isSettingUser = false">取消</n-button>
+                <n-button  round type="info" style="margin-right: 12px;" @click="updateUserData">確認</n-button>
+                <n-button  round type="error" @click="isSettingUser = false">取消</n-button>
             </div>
             <div v-show="isSettingUser" class="overlay" @click="isSettingUser = false"></div>
         </div>
@@ -158,7 +158,7 @@ onMounted(() => {
     padding-right: 2%;
     width: 100%;
     height: 64px;
-    background-color: rgb(236, 241, 251);
+    background-color: #142334;
 
     position: fixed;
     top: 0;
@@ -184,11 +184,12 @@ onMounted(() => {
 
     user-select: none;
     font-weight: bolder;
+    color: #a7a8bd;
 }
 
 .select-arrow {
-    width: 18px;
-    height: 18px;
+    width: 12px;
+    height: 12px;
 
     cursor: pointer;
 }
@@ -201,7 +202,7 @@ onMounted(() => {
 
     height: auto;
     width: 600px;
-    background-color: rgb(213, 227, 245);
+    background-color: #142334;
     border-radius: 10px;
 
     display: flex;
@@ -212,7 +213,7 @@ onMounted(() => {
 .project-list>div {
     height: 100%;
     width: 100%;
-    background-color: rgb(213, 227, 245);
+    background-color: #142334;
 }
 
 .project-list>div>ul {
@@ -226,10 +227,13 @@ onMounted(() => {
     padding-left: 12px;
     padding-right: 12px;
     margin-bottom: 2px;
+
+    color: #a7a8bd;
 }
 
 .project-list>div>ul>li:hover {
     background-color: rgb(178, 193, 211);
+    color: #142334;
 }
 
 .role-selector {
@@ -273,10 +277,13 @@ onMounted(() => {
 
     width: 250px;
     height: 250px;
-    background-color: rgb(196, 212, 232);
+    background-color: #142334;
     border-radius: 10px;
-
+    border: #a7a8bd double;
     padding: 32px;
+
+    color: #d3d3ee;
+
 }
 
 .overlay {
@@ -302,7 +309,7 @@ onMounted(() => {
     height: auto;
     padding: 12px;
     border-radius: 5px;
-    background-color: rgb(196, 212, 232);
+    background-color: #142334;
 }
 
 .projects-in-box {
@@ -319,7 +326,7 @@ onMounted(() => {
     line-height: 28px;
     text-align: center;
     font-weight: bold;
-    color: rgb(28, 0, 71);
+    color: #a7a8bd;
     border-radius: 2px;
 
     cursor: pointer;
@@ -328,5 +335,6 @@ onMounted(() => {
 
 .projects-in-box>ul>li:hover {
     background-color: rgb(178, 193, 211);
+    color: #142334;
 }
 </style>

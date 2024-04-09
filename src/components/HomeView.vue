@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onBeforeMount } from 'vue';
+import { Ref, ref, onBeforeMount } from 'vue';
 import { RouterView } from 'vue-router'
-import { reqGetUser, reqCreateUser, reqUpdateUser, reqGetProjects, reqGetEncryptStr, reqNewProject } from '../api';
+import { reqGetUser, reqCreateUser, reqUpdateUser, reqGetProjects, reqGetEncryptStr, reqNewProject, reqGetBranchList } from '../api';
 import { useNotification } from 'naive-ui'
 import NavBar from './NavBar.vue'
+import FooterBar from './FooterBar.vue';
 
 const isLoading = ref(false);
 const loadingMessage = ref('Loaging...');
@@ -13,6 +14,10 @@ const notification = useNotification();
 const user: any = ref({});
 
 const projects: any = ref([]);
+
+const selectedProject: any = ref('');
+
+const branchList: any = ref([]);
 
 onBeforeMount(async () => {
     let id = localStorage.getItem('id');
@@ -56,22 +61,30 @@ const onNewProject = async (name: string) => {
     }
 }
 
-const onSelectProject = (project: string) => {
-    console.log(project);
-
-}
-
-const test = () => {
-    // localStorage.removeItem("id");
-    isLoading.value = true;
+const onSelectProject = async (project: string) => {
+    selectedProject.value = project;
+    branchList.value = [];
+    switch(project) {
+        case 'dap-api':
+            branchList.value.push({
+                name: 'dap-api',
+                list: (await reqGetBranchList('dap-api', user.value.gitAccount)).data
+            });
+            branchList.value.push({
+                name: 'dap-api-admin',
+                list: (await reqGetBranchList('dap-api-admin', user.value.gitAccount)).data
+            });
+            break;
+    }
+    console.log(branchList.value);
 }
 </script>
 <template>
     <NavBar :user="user" :projects="projects" @update-user-data="onUpdateUserData" @select-project="onSelectProject"
         @new-project="onNewProject" />
-    <RouterView />
-    <button style="margin-top: 64px;" @click="test">press</button>
+    <RouterView :branchList="branchList" :selectedProject="selectedProject" />
     <div v-if="isLoading" class="overlay-cover">{{ loadingMessage }}</div>
+    <FooterBar />
 </template>
 
 <style scoped>
@@ -82,7 +95,7 @@ const test = () => {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.3);
-    z-index: 999;
+    z-index: 10000;
 
     text-align: center;
     align-content: center;

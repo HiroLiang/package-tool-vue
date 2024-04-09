@@ -22,9 +22,18 @@ const reqNewProject = (project: string, user: { id: number, userName: string, gi
     return request.post(`/git/${project}`, user, jsonHeader);
 }
 
+const reqGetBranchList = (project: string, gitAccount: string) => {
+    return request.get(`/git/branch/${project}/user/${gitAccount}`, jsonHeader);
+}
+
+const reqCompileProject = (project: string, branch: string) => {
+    request.get(`/git/compile/${project}/branch/${branch}`, jsonHeader);
+    return;
+}
+
 export {
     // User requests
     reqTest, reqGetUser, reqGetEncryptStr, reqCreateUser, reqUpdateUser,
     //Git requests
-    reqGetProjects, reqNewProject
+    reqGetProjects, reqNewProject, reqGetBranchList, reqCompileProject
 }
