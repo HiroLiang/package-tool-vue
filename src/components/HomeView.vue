@@ -11,7 +11,7 @@ const loadingMessage = ref('Loaging...');
 const notification = useNotification();
 
 
-const user: any = ref({});
+const user: any = ref({id: 0, userName: "", gitAccount: "", accessToken: ""});
 
 const projects: any = ref([]);
 
@@ -82,7 +82,7 @@ const onSelectProject = async (project: string) => {
 <template>
     <NavBar :user="user" :projects="projects" @update-user-data="onUpdateUserData" @select-project="onSelectProject"
         @new-project="onNewProject" />
-    <RouterView :branchList="branchList" :selectedProject="selectedProject" />
+    <RouterView :branchList="branchList" :selectedProject="selectedProject" :gitAccount="user.gitAccount" :accessToken="user.accessToken" />
     <div v-if="isLoading" class="overlay-cover">{{ loadingMessage }}</div>
     <FooterBar />
 </template>

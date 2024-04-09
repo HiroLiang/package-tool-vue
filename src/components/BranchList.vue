@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, PropType, Ref } from 'vue'
-import { reqCompileProject } from '../api';
-import { NButton } from 'naive-ui';
+import { NButton, useNotification } from 'naive-ui';
+
+const notification = useNotification();
+
+const isLoading = ref(false);
 
 const search: Ref<string[]> = ref([])
 
@@ -16,6 +19,14 @@ const props = defineProps({
         required: true
     },
     selectedProject:{
+        type: String,
+        required: true
+    },
+    gitAccount:{
+        type: String,
+        required: true
+    },
+    accessToken:{
         type: String,
         required: true
     }
@@ -35,12 +46,20 @@ const isSelected = (name: string, index: number) => {
 }
 
 const confirmSelect = () => {
+    if(selected.value.length == 0)
+        return;
     let branchs: string[] = [];
     branchs.push(props.selectedProject);
+    branchs.push(props.gitAccount);
+    branchs.push(props.accessToken);
     selected.value.forEach(e => {
+        console.log(e);
+        
         branchs.push(e.replace('origin/', ''));
     })
+    console.log(branchs);
     socket.send(branchs.join(',split,'));
+    isLoading.value = true;
 }
 
 // -----------------------------------------------------------------------------------------
@@ -54,6 +73,16 @@ socket.onopen = (event) => {
 
 socket.onmessage = function(event) {
     console.log("Message from server:", event.data);
+    isLoading.value = false;
+    if(event.data == 'y')
+        notification.success({
+            description: '包版完成',
+            duration:3000
+        });
+    if(event.data == 'n')
+        notification.error({
+            description: '包版失敗'
+    })
 };
 
  socket.onclose = function(event) {
@@ -85,6 +114,7 @@ socket.onmessage = function(event) {
             <n-button v-if="props.branchList.length > 0" type="info" strong secondary @click="confirmSelect">確認</n-button>
         </div>
     </div>
+    <div v-if="isLoading" class="overlay-cover">Compiling...</div>
 </template>
 <style scoped>
 .list-box {
@@ -142,5 +172,19 @@ socket.onmessage = function(event) {
     display: flex;
     flex-direction: column;
     justify-content: end;
+}
+
+.overlay-cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+
+    text-align: center;
+    align-content: center;
+    user-select: none;
 }
 </style>
