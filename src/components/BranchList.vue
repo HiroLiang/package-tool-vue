@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { ref, watch, PropType, Ref } from 'vue'
-import { NButton, useNotification } from 'naive-ui';
+import { NButton, useNotification, useDialog } from 'naive-ui';
 
+const dialog = useDialog();
 const notification = useNotification();
 
 const isLoading = ref(false);
 
-const search: Ref<string[]> = ref([])
+const serverMsg: Ref<string[]> = ref([]);
+const messageBox: any = ref(null);
 
-const selected: Ref<string[]> = ref([])
+const search: Ref<string[]> = ref([]);
+
+const selected: Ref<string[]> = ref([]);
 
 const props = defineProps({
     branchList:{
@@ -46,20 +50,59 @@ const isSelected = (name: string, index: number) => {
 }
 
 const confirmSelect = () => {
-    if(selected.value.length == 0)
+    if(selected.value.length != 2)
         return;
-    let branchs: string[] = [];
-    branchs.push(props.selectedProject);
-    branchs.push(props.gitAccount);
-    branchs.push(props.accessToken);
-    selected.value.forEach(e => {
-        console.log(e);
-        
-        branchs.push(e.replace('origin/', ''));
-    })
-    console.log(branchs);
-    socket.send(branchs.join(',split,'));
-    isLoading.value = true;
+    dialog.info({
+        title: '確認 dap-api 分支',
+        content: `${selected.value[0]}`,
+        positiveText: '確認',
+        negativeText: '取消',
+        onPositiveClick: () => {
+            dialog.info({
+                title: '確認dap-api-admin分支',
+                content: `${selected.value[1]}`,
+                positiveText: '確認',
+                negativeText: '取消',
+                onPositiveClick() {
+                    let branchs: string[] = [];
+                    branchs.push(props.selectedProject);
+                    branchs.push(props.gitAccount);
+                    branchs.push(props.accessToken);
+                    selected.value.forEach(e => {
+                        console.log(e);
+                        branchs.push(e.replace('origin/', ''));
+                    })
+                    console.log(branchs);
+                    socket.send(branchs.join(',split,'));
+                    isLoading.value = true;
+                },
+                onNegativeClick: () => {
+                    notification.warning({
+                    description: '取消包版',
+                    duration: 1000
+            })
+                }
+            })
+        },
+        onNegativeClick: () => {
+            notification.warning({
+                description: '取消包版',
+                duration: 1000
+            })
+        }
+    });
+    
+}
+
+const scrollBox = () => {
+    if(messageBox.value){
+        messageBox.value.scroll({
+            top: messageBox.value.scrollHeight,
+            way: 'instant'
+        })
+
+    }
+    
 }
 
 // -----------------------------------------------------------------------------------------
@@ -72,17 +115,27 @@ socket.onopen = (event) => {
 }
 
 socket.onmessage = function(event) {
-    console.log("Message from server:", event.data);
-    isLoading.value = false;
-    if(event.data == 'y')
+    if(event.data == 'y'){
+        isLoading.value = false;
+        serverMsg.value = []; 
         notification.success({
             description: '包版完成',
             duration:3000
         });
-    if(event.data == 'n')
+        return;
+    }
+    if(event.data == 'n'){
+        isLoading.value = false; 
+        serverMsg.value = [];   
         notification.error({
             description: '包版失敗'
-    })
+        });
+        return;
+    }
+    if(event.data.startsWith('{show}') && isLoading){
+        serverMsg.value.push(event.data.replace('{show}', ''));
+        scrollBox();
+    }
 };
 
  socket.onclose = function(event) {
@@ -114,7 +167,13 @@ socket.onmessage = function(event) {
             <n-button v-if="props.branchList.length > 0" type="info" strong secondary @click="confirmSelect">確認</n-button>
         </div>
     </div>
-    <div v-if="isLoading" class="overlay-cover">Compiling...</div>
+    <div v-if="isLoading" class="overlay-cover">
+        <div class="server-message" ref="messageBox">
+            <ul>
+                <li v-for="line in serverMsg" :key="line">{{ line }}</li>
+            </ul>
+        </div>
+    </div>
 </template>
 <style scoped>
 .list-box {
@@ -182,9 +241,29 @@ socket.onmessage = function(event) {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.3);
     z-index: 10000;
-
-    text-align: center;
-    align-content: center;
     user-select: none;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.server-message{
+    width: 70%;
+    height: 90%;
+    padding: 12px;
+    background-color: #142334;
+    overflow: auto;
+}
+
+.server-message>ul{
+    margin: 12px;
+    list-style-type: none;
+
+}
+
+.server-message>ul>li {
+    padding-left: 5px;
+    color: #a7a8bd;
 }
 </style>

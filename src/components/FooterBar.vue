@@ -1,12 +1,9 @@
 <script setup lang="ts">
 
-const test = () => {
-    // localStorage.removeItem("id");
-}
 </script>
 <template>
     <div class="footer-box">
-        <button @click="test">press</button>
+        
     </div>
 </template>
 <style scoped>

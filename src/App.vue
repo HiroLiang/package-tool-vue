@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { NMessageProvider, NNotificationProvider } from 'naive-ui'
+import { NMessageProvider, NNotificationProvider, NDialogProvider } from 'naive-ui'
 
 const placement = "top-right"
 
@@ -9,7 +9,9 @@ const placement = "top-right"
 <template>
   <n-message-provider :placement="placement" :max="8">
     <n-notification-provider :placement="placement">
-      <RouterView />
+      <n-dialog-provider>
+        <RouterView />
+      </n-dialog-provider>
     </n-notification-provider>
   </n-message-provider>
 </template>
