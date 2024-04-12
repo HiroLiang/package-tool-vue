@@ -24,7 +24,8 @@ onBeforeMount(async () => {
 
     if (id != null) {
         user.value = (await reqGetUser(id)).data;
-        projects.value = (await reqGetProjects(user.value.gitAccount)).data;
+        if(user.value.id != 0)
+            projects.value = (await reqGetProjects(user.value.gitAccount)).data;
     } else {
         user.value = { id: 0, userName: "", gitAccount: "", accessToken: "" }
     }
@@ -37,7 +38,8 @@ const onUpdateUserData = async (data: { userName: string, gitAccount: string, ac
         user.value = (await reqUpdateUser(nextUser.id, { id: nextUser.id, userName: data.userName, gitAccount: data.gitAccount, accessToken: data.accessToken })).data;
         let id = (await reqGetEncryptStr(user.value.id + '')).data;
         localStorage.setItem('id', id);
-        projects.value = (await reqGetProjects(user.value.gitAccount)).data;
+        if(user.value.id != 0)
+            projects.value = (await reqGetProjects(user.value.gitAccount)).data;
     }
 }
 
