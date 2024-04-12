@@ -12,7 +12,6 @@ request.interceptors.request.use(config => {
 });
 
 request.interceptors.response.use(rs => {
-    console.log(rs);
     return rs
 }, error => {
     return Promise.reject(new Error('Error : ' + error));

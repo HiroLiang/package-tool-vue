@@ -69,10 +69,8 @@ const confirmSelect = () => {
                     branchs.push(props.gitAccount);
                     branchs.push(props.accessToken);
                     selected.value.forEach(e => {
-                        console.log(e);
                         branchs.push(e.replace('origin/', ''));
                     })
-                    console.log(branchs);
                     socket.send(branchs.join(',split,'));
                     isLoading.value = true;
                 },
@@ -110,7 +108,6 @@ const scrollBox = () => {
 const socket = new WebSocket('ws://localhost:8080/compiler');
 
 socket.onopen = (event) => {
-    console.log("WebSocket connected.");
     socket.send("Project : " + props.selectedProject);
 }
 
@@ -139,7 +136,7 @@ socket.onmessage = function(event) {
 };
 
  socket.onclose = function(event) {
-    console.log("WebSocket closed.");
+    
 };
 
 </script>

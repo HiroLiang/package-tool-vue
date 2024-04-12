@@ -25,7 +25,6 @@ onBeforeMount(async () => {
     if (id != null) {
         user.value = (await reqGetUser(id)).data;
         projects.value = (await reqGetProjects(user.value.gitAccount)).data;
-        console.log(projects.value);
     } else {
         user.value = { id: 0, userName: "", gitAccount: "", accessToken: "" }
     }
@@ -49,7 +48,6 @@ const onNewProject = async (name: string) => {
     let result = (await reqNewProject(name, user.value)).data;
     isLoading.value = false;
     loadingMessage.value = 'Loading...';
-    console.log(result);
 
     if (result == 0) {
         notification.success({
@@ -76,7 +74,6 @@ const onSelectProject = async (project: string) => {
             });
             break;
     }
-    console.log(branchList.value);
 }
 </script>
 <template>
