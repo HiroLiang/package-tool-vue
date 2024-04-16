@@ -16,24 +16,21 @@ const reqUpdateUser = (id: number, user: { id: number, userName: string, gitAcco
     return request.put(`/user/${id}`, user, jsonHeader);
 }
 
-const reqGetProjects = (gitAccount: string) => request.get(`/git/${gitAccount}`, jsonHeader);
+const reqGetAllProject = () => request.get('/project/all', jsonHeader);
 
-const reqNewProject = (project: string, user: { id: number, userName: string, gitAccount: string, accessToken: string }) => {
-    return request.post(`/git/${project}`, user, jsonHeader);
+const reqGetProjects = (gitAccount: string) => request.get(`/project/${gitAccount}`, jsonHeader);
+
+const reqNewProject = (project: string, gitAccount: string) => {
+    return request.post(`/project/clone/${project}/${gitAccount}`, jsonHeader);
 }
 
-const reqGetBranchList = (project: string, gitAccount: string) => {
-    return request.get(`/git/branch/${project}/user/${gitAccount}`, jsonHeader);
-}
-
-const reqCompileProject = (project: string, branch: string) => {
-    request.get(`/git/compile/${project}/branch/${branch}`, jsonHeader);
-    return;
+const reqGetBranchList = (projectName: string, gitAccount: string) => {
+    return request.get(`/project/branch/${projectName}/${gitAccount}`, jsonHeader);
 }
 
 export {
     // User requests
     reqTest, reqGetUser, reqGetEncryptStr, reqCreateUser, reqUpdateUser,
     //Git requests
-    reqGetProjects, reqNewProject, reqGetBranchList, reqCompileProject
+    reqGetAllProject, reqGetProjects, reqNewProject, reqGetBranchList
 }

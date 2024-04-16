@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, PropType, watch, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { NInput, NButton } from 'naive-ui'
+
+const router = useRouter();
 
 const emit = defineEmits(['update-user-data', 'select-project', 'new-project'])
 
@@ -9,12 +12,15 @@ const unuseds = ref(['dap-api']);
 // User Data
 const hasUser = ref(false);
 const isSettingUser = ref(false);
-const user = ref({ userName: '', gitAccount: '', accessToken: '' })
+const user = ref({ userName: '', gitAccount: '', accessToken: '' });
 
 // Project Data
 const currenProject: any = ref(null);
-const isSelecting = ref(false)
-const isShowProjectBox = ref(false)
+const isSelecting = ref(false);
+const isShowProjectBox = ref(false);
+
+// cms
+const isCms = ref(false);
 
 // Define Props
 const props = defineProps({
@@ -29,7 +35,7 @@ const props = defineProps({
     },
     projects: {
         type: Object as PropType<[{
-            projectName: string
+            name: string
         }]>,
         required: true
     }
@@ -49,17 +55,27 @@ const newProjet = (name: string) => {
     emit('new-project', name);
 }
 
+watch(isCms, () => {
+    if(isCms.value){
+        router.replace({name:'cms'})
+    } else {
+        router.replace({name:'branchList'})
+        if(currenProject.value != null)
+            emit('select-project', currenProject.value);
+    }
+});
+
 watch(isSettingUser, () => {
     if (isSettingUser.value && hasUser.value) {
         user.value.userName = props.user.userName;
         user.value.gitAccount = props.user.gitAccount;
         user.value.accessToken = props.user.accessToken;
     }
-})
+});
 
 watch(currenProject, () => {
     emit('select-project', currenProject.value);
-})
+});
 
 watch(props, () => {
     if (props.user.id > 0) {
@@ -73,14 +89,15 @@ watch(props, () => {
 
     if (props.projects.length > 0) {
         props.projects.forEach(p => {
-            let i = unuseds.value.indexOf(p.projectName);
+            let i = unuseds.value.indexOf(p.name);
             if (i != -1)
                 unuseds.value.splice(i, 1);
         });
     }
-})
+});
 
 onMounted(() => {
+    router.replace({name:'branchList'})
     if (props.user.id > 0) {
         hasUser.value = true;
         user.value.userName = props.user.userName;
@@ -89,34 +106,37 @@ onMounted(() => {
     } else {
         hasUser.value = false;
     }
-})
+});
 
 </script>
 <template>
     <div class="navbar">
-        <div class="project-selector" v-if="hasUser" @click="isSelecting = !isSelecting">
-            <h1 v-if="currenProject == null">請選擇專案</h1>
-            <h1 v-else>{{ currenProject }}</h1>
-            <img v-if="!isSelecting" class="select-arrow" src="/src/assets/images/icons/right-arrow-svgrepo-com.svg" alt="選擇專案">
-            <img v-if="isSelecting" class="select-arrow" src="/src/assets/images/icons/down-arrow-svgrepo-com.svg" alt="選擇專案">
-            <div class="project-list" v-show="isSelecting">
-                <div>
-                    <ul>
-                        <li v-for="project in props.projects" @click="currenProject = project.projectName">
-                            {{ project.projectName }}
-                        </li>
-                        <li @click="showProjectBox">
-                            <img style="height: 12px; width: 12px;"
-                                src="/src/assets/images/icons/add-circle-outline.svg" alt="設定">
-                            新增專案
-                        </li>
-                    </ul>
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <div class="project-selector" v-if="hasUser" @click="isSelecting = !isSelecting">
+                <h1 v-if="currenProject == null">請選擇專案</h1>
+                <h1 v-else>{{ currenProject }}</h1>
+                <img v-if="!isSelecting" class="select-arrow" src="/src/assets/images/icons/right-arrow-svgrepo-com.svg" alt="選擇專案">
+                <img v-if="isSelecting" class="select-arrow" src="/src/assets/images/icons/down-arrow-svgrepo-com.svg" alt="選擇專案">
+                <div class="project-list" v-show="isSelecting">
+                    <div>
+                        <ul>
+                            <li v-for="project in props.projects" @click="currenProject = project.name">
+                                {{ project.name }}
+                            </li>
+                            <li @click="showProjectBox">
+                                <img style="height: 12px; width: 12px;"
+                                    src="/src/assets/images/icons/add-circle-outline.svg" alt="設定">
+                                新增專案
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="project-selector" v-else>
-            <h1 style="opacity: 0.5;">請選擇專案</h1>
-            <img class="select-arrow" style="opacity: 0.5;" src="/src/assets/images/icons/right-arrow-svgrepo-com.svg" alt="選擇專案">
+            <div class="project-selector" v-else>
+                <h1 style="opacity: 0.5;">請選擇專案</h1>
+                <img class="select-arrow" style="opacity: 0.5;" src="/src/assets/images/icons/right-arrow-svgrepo-com.svg" alt="選擇專案">
+            </div>
+            <n-button round color="#a7a8bd" size="tiny" ghost style="margin-left: 12px;" @click="isCms = !isCms">{{ isCms ? `包版` : `管理` }}</n-button>
         </div>
         <div class="role-selector">
             <div v-if="hasUser" style="color: #a7a8bd; font-weight: bolder;">
