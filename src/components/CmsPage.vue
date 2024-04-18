@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, Ref, onMounted } from 'vue';
-import { reqGetAllProject } from '../api';
+import { ref, Ref, onMounted, watch } from 'vue';
+import { reqAddProject, reqEditProject, reqGetAllProject } from '../api';
 import { NTable, NButton, NInput, NDropdown, NInputGroup, NInputGroupLabel } from 'naive-ui';
 import { GitProject } from './model/git-project';
 
@@ -24,11 +24,27 @@ const openEdit = (project: GitProject) => {
     if(currentEditName.value == project.name){
         currentEditName.value = '';
         currenEdit.value = {id:0, name: '', jdk: '', url: '', children: null};
+        initAllProjects();
     } else {
         currentEditName.value = project.name;
         copyProject(currenEdit.value, project)
     } 
     console.log(currenEdit.value);
+}
+
+const newEdit = () => {
+    allProjects.value.push({id: null, name: '', jdk: '', url : '', children : null});
+    currenEdit.value = {id: null, name: '', jdk: 'JAVA8', url : '', children : null};
+}
+
+const editProject = async () => {
+    console.log(currenEdit.value);
+    if(currenEdit.value.id != null){
+        await reqEditProject(currenEdit.value);
+    } else {
+        await reqAddProject(currenEdit.value);
+    }
+    initAllProjects();
 }
 
 const copyProject = (newProject: GitProject, oldProjext: GitProject): GitProject => {
@@ -59,7 +75,9 @@ const getLabel = (jdk: string): string => {
 
 const newModule = () => {
     if(currenEdit.value.children != null){
-        currenEdit.value.children.push({id:0, name: '', jdk: '', url: '', children: []});
+        currenEdit.value.children.push({id: null, name: '', jdk: '', url: '', children: []});
+    } else {
+        currenEdit.value.children = [{id: null, name: '', jdk: '', url: '', children: []}];
     }
 }
 
@@ -71,9 +89,14 @@ const handleSelect = (key: string ) => {
     currentJdkProject.value.jdk = key;
 }
 
-onMounted(async () => {
+const initAllProjects = async () => {
     allProjects.value = (await reqGetAllProject()).data;
     currenEdit.value = {id:0, name: '', jdk: '', url: '', children: null};
+    currentEditName.value = '';
+}
+
+onMounted(() => {
+    initAllProjects();
 });
 
 </script>
@@ -153,7 +176,7 @@ onMounted(async () => {
                                         <p>+</p>
                                     </div>
                                     <div style="display: flex; justify-content:center; align-items: center;">
-                                        <n-button round color="#375881" size="tiny" ghost style="margin-top: 4px; margin-right: 4px;" @click="">
+                                        <n-button round color="#375881" size="tiny" ghost style="margin-top: 4px; margin-right: 4px;" @click="editProject">
                                             更新
                                         </n-button>
                                         <n-button round color="#375881" size="tiny" ghost style="margin-top: 4px; margin-left: 4px;" @click="openEdit(project)">
@@ -167,7 +190,7 @@ onMounted(async () => {
                 </tbody>
             </n-table>
             <div class="button-container">
-                <n-button round color="#375881" size="tiny" ghost style="margin-left: 12px;" @click="">新增專案</n-button>
+                <n-button round color="#375881" size="tiny" ghost style="margin-left: 12px;" @click="newEdit">新增專案</n-button>
             </div>
         </div>
     </div>

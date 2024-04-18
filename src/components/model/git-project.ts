@@ -1,5 +1,5 @@
 export interface GitProject {
-    id: number,
+    id: null | number,
     name: string,
     url: string,
     jdk: string,

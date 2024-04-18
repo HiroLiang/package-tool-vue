@@ -2,6 +2,8 @@
 import { ref, PropType, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { NInput, NButton } from 'naive-ui'
+import { reqGetAllProject } from '../api';
+import { GitProject } from './model/git-project';
 
 const router = useRouter();
 
@@ -77,7 +79,7 @@ watch(currenProject, () => {
     emit('select-project', currenProject.value);
 });
 
-watch(props, () => {
+watch(props, async () => {
     if (props.user.id > 0) {
         hasUser.value = true;
         user.value.userName = props.user.userName;
@@ -86,6 +88,12 @@ watch(props, () => {
     } else {
         hasUser.value = false;
     }
+
+    unuseds.value = [];
+    let allproj: GitProject[] = (await reqGetAllProject()).data;
+    allproj.forEach(p => {
+        unuseds.value.push(p.name);
+    });
 
     if (props.projects.length > 0) {
         props.projects.forEach(p => {
