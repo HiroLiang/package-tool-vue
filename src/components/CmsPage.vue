@@ -29,7 +29,6 @@ const openEdit = (project: GitProject) => {
         currentEditName.value = project.name;
         copyProject(currenEdit.value, project)
     } 
-    console.log(currenEdit.value);
 }
 
 const newEdit = () => {
@@ -38,7 +37,6 @@ const newEdit = () => {
 }
 
 const editProject = async () => {
-    console.log(currenEdit.value);
     if(currenEdit.value.id != null){
         await reqEditProject(currenEdit.value);
     } else {
@@ -148,16 +146,16 @@ onMounted(() => {
                                             </n-input-group>
                                             </p>
                                     </div>
-                                    <div v-for="mpdule in currenEdit.children" :key="mpdule.id" class="project-module">
+                                    <div v-for="module in currenEdit.children" :key="module.name" class="project-module"> 
                                         <div style="display: flex; justify-content: space-between;align-items: center;">
                                             <p>
                                                 子專案名稱 :
-                                                <n-input type="text" v-model:value="mpdule.name"/>
+                                                <n-input type="text" v-model:value="module.name"/>
                                             </p>
                                             <p>
                                                 JDK 版本 :
                                                 <n-dropdown trigger="click" :options="javaVersion" @select="handleSelect">
-                                                    <n-button @mouseover="preSetJdkProject(mpdule)">{{ getLabel(mpdule.jdk) }}</n-button>
+                                                    <n-button @mouseover="preSetJdkProject(module)">{{ getLabel(module.jdk) }}</n-button>
                                                 </n-dropdown>
                                             </p>   
                                             <p></p>
@@ -167,7 +165,7 @@ onMounted(() => {
                                                 Git URL :
                                                 <n-input-group>
                                                     <n-input-group-label>https://</n-input-group-label>    
-                                                    <n-input type="text" v-model:value="mpdule.url"/>
+                                                    <n-input type="text" v-model:value="module.url" />
                                                 </n-input-group>
                                                 </p>
                                         </div>

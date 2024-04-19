@@ -82,7 +82,7 @@ const checkBranch = (c: number) => {
                         branch: selected.value[i].replace('origin/', '')
                     });
                 }
-                branchs.push(btoa(JSON.stringify(objs)));
+                branchs.push(utf8_to_base64(JSON.stringify(objs)));
                 socket.send(branchs.join(',split,'));
                 isLoading.value = true;
             }
@@ -98,15 +98,17 @@ const checkBranch = (c: number) => {
     return result;
 }
 
+const utf8_to_base64 = (str: string): string => {
+    return btoa(encodeURIComponent(str));
+}
+
 const scrollBox = () => {
     if(messageBox.value){
         messageBox.value.scroll({
             top: messageBox.value.scrollHeight,
             way: 'instant'
         })
-
     }
-    
 }
 
 // -----------------------------------------------------------------------------------------
