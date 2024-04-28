@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Ref, ref, onBeforeMount } from 'vue';
 import { RouterView } from 'vue-router'
-import { reqGetUser, reqCreateUser, reqUpdateUser, reqGetProjects, reqGetEncryptStr, reqNewProject, reqGetBranchList } from '../api';
+import { reqGetUser, reqCreateUser, reqUpdateUser, reqGetProjects, reqGetEncryptStr, reqCloneProject, reqGetBranchList } from '../api';
 import { useNotification } from 'naive-ui'
+import { ProjectBranchs } from './model/project-branchs';
 import NavBar from './NavBar.vue'
 import FooterBar from './FooterBar.vue';
 
@@ -47,7 +48,7 @@ const onNewProject = async (name: string) => {
 
     isLoading.value = true;
     loadingMessage.value = `Clone Project: ${name}, Loading...`;
-    let result = (await reqNewProject(name, user.value)).data;
+    let result = (await reqCloneProject(name, user.value.gitAccount)).data;
     isLoading.value = false;
     loadingMessage.value = 'Loading...';
 
@@ -64,18 +65,18 @@ const onNewProject = async (name: string) => {
 const onSelectProject = async (project: string) => {
     selectedProject.value = project;
     branchList.value = [];
-    switch(project) {
-        case 'dap-api':
-            branchList.value.push({
-                name: 'dap-api',
-                list: (await reqGetBranchList('dap-api', user.value.gitAccount)).data
-            });
-            branchList.value.push({
-                name: 'dap-api-admin',
-                list: (await reqGetBranchList('dap-api-admin', user.value.gitAccount)).data
-            });
-            break;
-    }
+    let dto = (await reqGetBranchList(selectedProject.value, user.value.gitAccount)).data;
+    putBranchsValue(dto);
+}
+
+const putBranchsValue = (dto: ProjectBranchs) => {
+    branchList.value.push({
+        name: dto.name,
+        list: dto.branchs
+    });
+    dto.children.forEach(child => {
+        putBranchsValue(child);
+    }); 
 }
 </script>
 <template>

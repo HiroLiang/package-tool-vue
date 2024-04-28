@@ -50,46 +50,56 @@ const isSelected = (name: string, index: number) => {
 }
 
 const confirmSelect = () => {
-    if(selected.value.length != 2)
+    if(selected.value.length != props.branchList.length)
         return;
+    
+    checkBranch(0);
+    
+}
+
+const checkBranch = (c: number) => {
+    let result = false;
+    let project = props.branchList[c];
+    let branch = selected.value[c];
+    
     dialog.info({
-        title: '確認 dap-api 分支',
-        content: `${selected.value[0]}`,
+        title: `確認 ${project.name} 分支`,
+        content: `${branch}`,
         positiveText: '確認',
         negativeText: '取消',
-        onPositiveClick: () => {
-            dialog.info({
-                title: '確認dap-api-admin分支',
-                content: `${selected.value[1]}`,
-                positiveText: '確認',
-                negativeText: '取消',
-                onPositiveClick() {
-                    let branchs: string[] = [];
-                    branchs.push(props.selectedProject);
-                    branchs.push(props.gitAccount);
-                    branchs.push(props.accessToken);
-                    selected.value.forEach(e => {
-                        branchs.push(e.replace('origin/', ''));
-                    })
-                    socket.send(branchs.join(',split,'));
-                    isLoading.value = true;
-                },
-                onNegativeClick: () => {
-                    notification.warning({
-                    description: '取消包版',
-                    duration: 1000
-            })
+        onPositiveClick: () => {    
+            if(c < props.branchList.length - 1)
+                result = checkBranch(c + 1);
+            if(c == props.branchList.length - 1){
+                let branchs: string[] = [];
+                branchs.push('compile')
+                branchs.push(props.selectedProject);
+                branchs.push(props.gitAccount);
+                let objs = [];
+                for(let i = 0 ; i < selected.value.length ; i ++){
+                    objs.push({
+                        name: props.branchList[i].name,
+                        branch: selected.value[i].replace('origin/', '')
+                    });
                 }
-            })
+                branchs.push(utf8_to_base64(JSON.stringify(objs)));
+                socket.send(branchs.join(',split,'));
+                isLoading.value = true;
+            }
         },
         onNegativeClick: () => {
+            result = false;
             notification.warning({
                 description: '取消包版',
                 duration: 1000
             })
         }
     });
-    
+    return result;
+}
+
+const utf8_to_base64 = (str: string): string => {
+    return btoa(encodeURIComponent(str));
 }
 
 const scrollBox = () => {
@@ -98,9 +108,7 @@ const scrollBox = () => {
             top: messageBox.value.scrollHeight,
             way: 'instant'
         })
-
     }
-    
 }
 
 // -----------------------------------------------------------------------------------------
@@ -153,7 +161,7 @@ socket.onmessage = function(event) {
                         <ul>
                             <li v-if="'master'.includes(search[index])" @click="selected[index] = 'master'" :style="isSelected('master', index)">origin/master</li>
                             <template v-for="branch in projct.list" :key="branch">
-                                <li v-if="branch.includes(search[index])" @click="selected[index] = branch" :style="isSelected(branch, index)">{{ branch }}</li>
+                                <li v-if="branch.includes(search[index]) && !branch.startsWith('  origin/HEAD')" @click="selected[index] = branch" :style="isSelected(branch, index)">{{ branch }}</li>
                             </template>
                         </ul>
                     </div>
