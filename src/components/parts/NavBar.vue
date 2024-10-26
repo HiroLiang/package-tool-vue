@@ -2,8 +2,8 @@
 import { ref, PropType, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { NInput, NButton } from 'naive-ui'
-import { reqGetAllProject } from '../api';
-import { GitProject } from './model/git-project';
+import { reqGetAllProject } from '../../api';
+import { GitProject } from '../model/git-project.ts';
 
 const router = useRouter();
 
@@ -133,7 +133,7 @@ onMounted(() => {
                             </li>
                             <li @click="showProjectBox">
                                 <img style="height: 12px; width: 12px;"
-                                    src="/src/assets/images/icons/add-circle-outline.svg" alt="設定">
+                                     src="/src/assets/images/icons/add-circle-outline.svg" alt="設定">
                                 新增專案
                             </li>
                         </ul>

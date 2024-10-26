@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import { useUserAuth } from "./store/user-auth.ts";
 import { NMessageProvider, NNotificationProvider, NDialogProvider } from 'naive-ui'
 
-const placement = "top-right"
+// position of notification
+const placement = 'top-right';
+
+// store of auth
+const userAuth = useUserAuth();
+userAuth.init();
 
 </script>
 

@@ -4,8 +4,8 @@ import { RouterView } from 'vue-router'
 import { reqGetUser, reqCreateUser, reqUpdateUser, reqGetProjects, reqGetEncryptStr, reqCloneProject, reqGetBranchList } from '../api';
 import { useNotification } from 'naive-ui'
 import { ProjectBranchs } from './model/project-branchs';
-import NavBar from './NavBar.vue'
-import FooterBar from './FooterBar.vue';
+import NavBar from './parts/NavBar.vue'
+import FooterBar from './parts/FooterBar.vue';
 
 const isLoading = ref(false);
 const loadingMessage = ref('Loaging...');

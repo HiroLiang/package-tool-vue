@@ -12,7 +12,7 @@ const router: Router = createRouter({
                 {
                     path: '',
                     name: 'branchList',
-                    component: () => import('../components/BranchList.vue')
+                    component: () => import('../components/parts/BranchList.vue')
                 },
                 {
                     path: '/cms',
